@@ -407,6 +407,28 @@
   transition: all 0.3s;
 }
 
+.continue-button {
+  padding: 12px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+  margin-top: 1rem;
+}
+
+.continue-button:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
 .click-counter {
   font-size: 1.1rem;
   color: var(--accent);

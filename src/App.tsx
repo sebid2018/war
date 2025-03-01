@@ -16,6 +16,7 @@ function App() {
   const [clickCount, setClickCount] = useState(0)
   const [isBlocking, setIsBlocking] = useState(false)
   const [gameMessage, setGameMessage] = useState('')
+  const [showContinueButton, setShowContinueButton] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const [winner, setWinner] = useState<'player' | 'enemy' | null>(null)
   const [level, setLevel] = useState(1)
@@ -104,35 +105,38 @@ function App() {
     setClickCount(0)
     setIsBlocking(false)
 
-    // Enemy counter-attack after 1 second
-    setTimeout(() => {
-      const enemyDamage = level === 1 ? 5 : 7 // More damage in level 2
-      
-      // Create explosion effect on player side for enemy attack
-      if (!isBlocking) {
+    // Show continue button after attack
+    setShowContinueButton(true)
+  }
+
+  const handleEnemyCounterAttack = () => {
+    const enemyDamage = level === 1 ? 5 : 7 // More damage in level 2
+    
+    // Create explosion effect on player side for enemy attack
+    if (!isBlocking) {
+      createExplosion(window.innerWidth * 0.2, window.innerHeight * 0.5)
+      setPlayerShake(true)
+      setTimeout(() => setPlayerShake(false), 500)
+    }
+    
+    if (!isBlocking) {
+      setPlayerHP(prev => Math.max(0, prev - enemyDamage))
+      setGameMessage(`Enemy counter-attacked for ${enemyDamage} damage!`)
+    } else {
+      const blockedDamage = Math.min(blockPower, enemyDamage)
+      const remainingDamage = enemyDamage - blockedDamage
+      if (remainingDamage > 0) {
+        setPlayerHP(prev => Math.max(0, prev - remainingDamage))
+        setGameMessage(`Blocked ${blockedDamage} damage! Took ${remainingDamage} damage!`)
         createExplosion(window.innerWidth * 0.2, window.innerHeight * 0.5)
         setPlayerShake(true)
         setTimeout(() => setPlayerShake(false), 500)
-      }
-      
-      if (!isBlocking) {
-        setPlayerHP(prev => Math.max(0, prev - enemyDamage))
-        setGameMessage(`Enemy counter-attacked for ${enemyDamage} damage!`)
       } else {
-        const blockedDamage = Math.min(blockPower, enemyDamage)
-        const remainingDamage = enemyDamage - blockedDamage
-        if (remainingDamage > 0) {
-          setPlayerHP(prev => Math.max(0, prev - remainingDamage))
-          setGameMessage(`Blocked ${blockedDamage} damage! Took ${remainingDamage} damage!`)
-          createExplosion(window.innerWidth * 0.2, window.innerHeight * 0.5)
-          setPlayerShake(true)
-          setTimeout(() => setPlayerShake(false), 500)
-        } else {
-          setGameMessage('Blocked all damage!')
-        }
+        setGameMessage('Blocked all damage!')
       }
-      setShowAttackButtons(true)
-    }, 1000)
+    }
+    setShowAttackButtons(true)
+    setShowContinueButton(false)
   }
 
   const handleSpamClick = () => {
@@ -259,6 +263,14 @@ function App() {
                   </div>
                 )}
                 <div className="game-message">{gameMessage}</div>
+                {showContinueButton && (
+                  <button 
+                    className="continue-button"
+                    onClick={handleEnemyCounterAttack}
+                  >
+                    Continue
+                  </button>
+                )}
                 {clickCount > 0 && blockPower > 0 && (
                   <div className="click-counter">Clicks: {clickCount}/20</div>
                 )}
